@@ -104,40 +104,24 @@ const getAllProperties = (options, limit = 10) => {
   // if owner_id return properties beloning to that owner
   if (options.owner_id) {
     queryParams.push(`${options.owner_id}`);
-    if (queryParams.length > 0) {
-      queryString += `AND owner_id LIKE $${queryParams.length} `;
-    } else {
-      queryString += `WHERE owner_id LIKE $${queryParams.length} `;
-    }
+    queryString += `AND owner_id LIKE $${queryParams.length} `;
   }
 
   // if minimum_price_per_night and maximum_price_per_night return properties within that price range
   if (options.minimum_price_per_night) {
-    queryParams.push(parseInt(options.minimum_price_per_night) / 0.01);
-    if (queryParams.length > 0) {
-      queryString += `AND minimum_price_per_night >= $${queryParams.length} `;
-    } else {
-      queryString += `WHERE minimum_price_per_night >= $${queryParams.length} `;
-    }
+    queryParams.push(`${options.minimum_price_per_night} * 100}`);
+    queryString += `AND minimum_price_per_night >= $${queryParams.length} `;
   }
 
   if (options.maximum_price_per_night) {
-    queryParams.push(parseInt(options.maximum_price_per_night) / 0.01);
-    if (queryParams.length > 0) {
-      queryString += `AND maximum_price_per_night <= $${queryParams.length} `;
-    } else {
-      queryString += `WHERE maximum_price_per_night <= $${queryParams.length} `;
-    }
+    queryParams.push(`${options.maximum_price_per_night} * 100}`);
+    queryString += `AND maximum_price_per_night <= $${queryParams.length} `;
   }
 
   // if minimum_rating return properties with rating equal or higher
   if (options.minimum_rating) {
-    queryParams.push(parseFloat(options.minimum_rating) / 0.01);
-    if (queryParams.length > 0) {
-      queryString += `AND minimum_rating >= $${queryParams.length} `;
-    } else {
-      queryString += `WHERE minimum_rating >= $${queryParams.length} `;
-    }
+    queryParams.push(`${options.minimum_rating}`);
+    queryString += `AND minimum_rating >= $${queryParams.length} `;
   }
 
   // query comes after WHERE clause
@@ -147,9 +131,6 @@ const getAllProperties = (options, limit = 10) => {
   ORDER BY cost_per_night
   LIMIT $${queryParams.length};
   `;
-
-  // check to see if working
-  console.log(queryString, queryParams);
   
   return pool.query(queryString, queryParams).then((res) => {
     return Promise.resolve(res.rows);
