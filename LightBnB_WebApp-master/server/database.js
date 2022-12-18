@@ -1,13 +1,13 @@
-const properties = require('./json/properties.json');
-const users = require('./json/users.json');
+const properties = require("./json/properties.json");
+const users = require("./json/users.json");
 
-const { Pool } = require('pg');
+const { Pool } = require("pg");
 
 const pool = new Pool({
-  user: 'vagrant',
-  password: '123',
-  host: 'localhost',
-  database: 'lightbnb'
+  user: "vagrant",
+  password: "123",
+  host: "localhost",
+  database: "lightbnb",
 });
 
 /// Users refactored to use lightbnb database and SQL queries
@@ -20,8 +20,8 @@ const pool = new Pool({
 const getUserWithEmail = (email) => {
   return pool
     .query(`SELECT * FROM users WHERE email = $1;`, [email])
-    .then(res => res.rows[0])
-    .catch(err => null);
+    .then((res) => res.rows[0])
+    .catch((err) => null);
 };
 exports.getUserWithEmail = getUserWithEmail;
 
@@ -33,8 +33,8 @@ exports.getUserWithEmail = getUserWithEmail;
 const getUserWithId = (id) => {
   return pool
     .query(`SELECT * FROM users WHERE id = $1`, [id])
-    .then(res => res.rows[0])
-    .catch(err => null);
+    .then((res) => res.rows[0])
+    .catch((err) => null);
 };
 exports.getUserWithId = getUserWithId;
 
@@ -45,8 +45,11 @@ exports.getUserWithId = getUserWithId;
  */
 const addUser = (user) => {
   return pool
-    .query(`INSERT INTO users (name, email, password) VALUES($1, $2, $3) RETURNING *`, [user.name, user.email, user.password])
-    .then(res => res.rows[0]);
+    .query(
+      `INSERT INTO users (name, email, password) VALUES($1, $2, $3) RETURNING *`,
+      [user.name, user.email, user.password]
+    )
+    .then((res) => res.rows[0]);
 };
 exports.addUser = addUser;
 
@@ -58,25 +61,29 @@ exports.addUser = addUser;
  * @return {Promise<[{}]>} A promise to the reservations.
  */
 
-const getAllReservations = function(guest_id, limit = 10) {
-  return pool.query(`
-  SELECT reservations. *, properties. *, AVG(property_reviews.rating) as average_rating
-  FROM reservations
-  JOIN properties ON properties.id = reservations.property_id
-  JOIN property_reviews ON properties.id = property_reviews.property_id
-  WHERE end_date < now()::date
-  AND reservations.guest_id = $1
-  GROUP BY reservations.id, properties.id
-  ORDER BY start_date
-  LIMIT $2
-  `, [guest_id, limit])
-    .then(res => res.rows)
-    .catch(err => {
+const getAllReservations = function (guest_id, limit = 10) {
+  return pool
+    .query(
+      `
+      SELECT reservations. *, properties. *, AVG(property_reviews.rating) as average_rating
+      FROM reservations
+      JOIN properties ON properties.id = reservations.property_id
+      JOIN property_reviews ON properties.id = property_reviews.property_id
+      WHERE end_date < now()::date
+      AND reservations.guest_id = $1
+      GROUP BY reservations.id, properties.id
+      ORDER BY start_date
+      LIMIT $2
+      `,
+      [guest_id, limit]
+    )
+    .then((res) => res.rows)
+    .catch((err) => {
       return null;
     });
 };
 exports.getAllReservations = getAllReservations;
-  
+
 /// Properties refactored to use lightbnb database and SQL queries
 
 /**
@@ -131,7 +138,7 @@ const getAllProperties = (options, limit = 10) => {
   ORDER BY cost_per_night
   LIMIT $${queryParams.length};
   `;
-  
+
   return pool.query(queryString, queryParams).then((res) => {
     return Promise.resolve(res.rows);
   });
@@ -144,7 +151,7 @@ exports.getAllProperties = getAllProperties;
  * @param {{}} property An object containing all of the property details.
  * @return {Promise<{}>} A promise to the property.
  */
-const addProperty = function(property) {
+const addProperty = function (property) {
   const queryString = `
   INSERT INTO properties (owner_id, title, description, thumbnail_photo_url, cover_photo_url, cost_per_night, street, city, province, post_code, country, parking_spaces, number_of_bedrooms, number_of_bathrooms)
   VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
