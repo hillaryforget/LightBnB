@@ -90,7 +90,7 @@ const getAllProperties = (options, limit = 10) => {
   const queryParams = [];
   // start the query with all information that comes before the WHERE clause
   let queryString = `
-  SELECT properties.*, avg(property_reviews.rating) as average_rating
+  SELECT properties.*, AVG(property_reviews.rating) as average_rating
   FROM properties
   JOIN property_reviews ON properties.id = property_id
   `;
@@ -109,19 +109,19 @@ const getAllProperties = (options, limit = 10) => {
 
   // if minimum_price_per_night and maximum_price_per_night return properties within that price range
   if (options.minimum_price_per_night) {
-    queryParams.push(`${options.minimum_price_per_night} * 100}`);
-    queryString += `AND minimum_price_per_night >= $${queryParams.length}`;
+    queryParams.push(`${parseFloat(options.minimum_price_per_night) * 100}`);
+    queryString += `AND cost_per_night >= $${queryParams.length}`;
   }
 
   if (options.maximum_price_per_night) {
-    queryParams.push(`${options.maximum_price_per_night} * 100}`);
-    queryString += `AND maximum_price_per_night <= $${queryParams.length}`;
+    queryParams.push(`${parseFloat(options.maximum_price_per_night) * 100}`);
+    queryString += `AND cost_per_night <= $${queryParams.length}`;
   }
 
   // if minimum_rating return properties with rating equal or higher
   if (options.minimum_rating) {
     queryParams.push(`${options.minimum_rating}`);
-    queryString += `AND minimum_rating >= $${queryParams.length}`;
+    queryString += `AND (SELECT AVG(property_reviews.rating) FROM property_reviews WHERE property_id=properties.id) >= $${queryParams.length}`;
   }
 
   // query comes after WHERE clause
