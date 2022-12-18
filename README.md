@@ -3,7 +3,7 @@
 A simple multi-page AirBnB clone that uses server-side Javascript to display the information from queries to web pages via SQL queries.
 
 ## Web App Image
-![This is an image](screenshot_1.png)
+![This is an image](Docs/screenshot_1.png)
 ## Setup
 1. Clone this repository
 2. Open your terminal and cd into the directory
@@ -55,7 +55,7 @@ A simple multi-page AirBnB clone that uses server-side Javascript to display the
   * `database.js` is responsible for all queries to the database. It doesn't currently connect to any database, all it does is return data from `.json` files.
 
   ## Database Structure
-  ![This is an image](screenshot_2.png)
+  ![This is an image](Docs/screenshot_2.png)
 
   ## Dependencies 
   ```
